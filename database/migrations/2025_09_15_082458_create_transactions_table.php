@@ -6,20 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    // database/migrations/xxxx_create_transactions_table.php
     public function up(): void
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
+            $table->date('date');
+            $table->enum('type', ['pemasukan', 'pengeluaran']);
+            $table->text('description');
+            $table->integer('amount');
+            $table->foreignId('order_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('transactions');
