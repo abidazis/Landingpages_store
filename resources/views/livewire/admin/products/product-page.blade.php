@@ -1,10 +1,10 @@
 <div>
     <h2 class="text-2xl font-bold mb-4">Manajemen Produk</h2>
 
-    {{-- Tombol untuk menambah produk baru --}}
-    <button wire:click="openModal()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
+    {{-- Tombol untuk menambah produk baru, sekarang memanggil method "create" --}}
+    <x-button wire:click="create()" class="mb-4">
         Tambah Produk
-    </button>
+    </x-button>
 
     {{-- Tabel untuk menampilkan produk --}}
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -32,8 +32,11 @@
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ $product->stock }}</td>
                         <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                            <button class="text-indigo-600 hover:text-indigo-900">Edit</button>
-                            <button class="text-red-600 hover:text-red-900 ml-4">Hapus</button>
+                            {{-- Tombol Edit & Hapus yang sudah fungsional --}}
+                            <button wire:click="edit({{ $product->id }})" class="text-indigo-600 hover:text-indigo-900">Edit</button>
+                            <button wire:click="delete({{ $product->id }})" wire:confirm="Apakah Anda yakin ingin menghapus produk '{{ $product->name }}'?" class="text-red-600 hover:text-red-900 ml-4">
+                                Hapus
+                            </button>
                         </td>
                     </tr>
                 @empty
@@ -45,55 +48,42 @@
         </table>
     </div>
 
-    {{-- Modal untuk Tambah/Edit Produk --}}
-    @if ($isModalOpen)
-        <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
-                <h3 class="text-lg font-bold mb-4">Tambah Produk Baru</h3>
-                <form wire:submit="save">
-                    <div class="mb-4">
-                        <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Nama Produk:</label>
-                        <input type="text" id="name" wire:model="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        @error('name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="mb-4">
-                        <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Deskripsi:</label>
-                        <textarea id="description" wire:model="description" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
-                        @error('description') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="mb-4">
-                            <label for="price" class="block text-gray-700 text-sm font-bold mb-2">Harga:</label>
-                            <input type="number" id="price" wire:model="price" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                            @error('price') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="mb-4">
-                            <label for="stock" class="block text-gray-700 text-sm font-bold mb-2">Stok:</label>
-                            <input type="number" id="stock" wire:model="stock" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                            @error('stock') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label for="type" class="block text-gray-700 text-sm font-bold mb-2">Tipe:</label>
-                        <select id="type" wire:model="type" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                            <option value="dijual">Dijual</option>
-                            <option value="disewakan">Disewakan</option>
-                        </select>
-                        @error('type') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
+    {{-- Link Paginasi --}}
+    <div class="mt-4">
+        {{ $products->links() }}
+    </div>
 
-                    <div class="flex items-center justify-end">
-                        <button type="button" wire:click="closeModal()" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2">
-                            Batal
-                        </button>
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Simpan
-                        </button>
-                    </div>
-                </form>
+    {{-- Komponen Modal yang sudah benar --}}
+    <x-modal :isOpen="$isModalOpen">
+        {{-- Slot untuk judul, sekarang berada DI DALAM komponen modal dan dinamis --}}
+        <x-slot name="title">
+            {{ $productId ? 'Edit Produk' : 'Tambah Produk Baru' }}
+        </x-slot>
+
+        <form wire:submit="save">
+            <x-form.input label="Nama Produk" wireModel="name" type="text" />
+            <x-form.textarea label="Deskripsi" wireModel="description" />
+            
+            <div class="grid grid-cols-2 gap-4">
+                <x-form.input label="Harga" wireModel="price" type="number" />
+                <x-form.input label="Stok" wireModel="stock" type="number" />
             </div>
-        </div>
-    @endif
+
+            <x-form.select label="Tipe" wireModel="type">
+                <option value="dijual">Dijual</option>
+                <option value="disewakan">Disewakan</option>
+            </x-form.select>
+
+            <div class="flex items-center justify-end mt-4">
+                <x-button type="button" wire:click="closeModal()" variant="secondary" class="mr-2">
+                    Batal
+                </x-button>
+                <x-button type="submit">
+                    Simpan
+                </x-button>
+            </div>
+        </form>
+    </x-modal>
 
     {{-- Notifikasi Sukses --}}
     @if (session()->has('message'))
@@ -101,8 +91,4 @@
             {{ session('message') }}
         </div>
     @endif
-    {{-- Link Paginasi --}}
-    <div class="mt-4">
-        {{ $products->links() }}
-    </div>
 </div>
