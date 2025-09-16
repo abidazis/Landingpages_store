@@ -2,39 +2,36 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Import untuk Admin
+// == BAGIAN 1: RUTE PUBLIK (BISA DIAKSES SEMUA ORANG) ==
+// Import komponen untuk halaman publik
+use App\Livewire\Public\HomePage;
+use App\Livewire\Public\CatalogPage;
+use App\Livewire\Public\ProductDetailPage;
+
+Route::get('/', HomePage::class);
+Route::get('/katalog', CatalogPage::class);
+Route::get('/produk/{product:slug}', ProductDetailPage::class);
+
+
+// == BAGIAN 2: RUTE ADMIN (WAJIB LOGIN) ==
+// Import komponen untuk halaman admin
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Products\ProductPage;
 use App\Livewire\Admin\Orders\OrderPage;
 use App\Livewire\Admin\Finance\FinancePage;
 use App\Livewire\Admin\Sliders\SliderPage;
-use App\Livewire\Public\CatalogPage;
-use App\Livewire\Public\ProductDetailPage;
 
-// ===============================================
-// 1. Import komponen HomePage untuk halaman publik
-use App\Livewire\Public\HomePage;
-// ===============================================
-
-
-// ===============================================
-// 2. Ganti route '/' yang lama
-/*
-Route::get('/', function () {
-    return view('welcome');
+// Semua route di dalam grup ini akan otomatis dilindungi oleh middleware 'auth'
+Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', Dashboard::class)->name('admin.dashboard');
+    Route::get('/products', ProductPage::class)->name('admin.products');
+    Route::get('/orders', OrderPage::class)->name('admin.orders');
+    Route::get('/finance', FinancePage::class)->name('admin.finance');
+    Route::get('/sliders', SliderPage::class)->name('admin.sliders');
 });
-*/
-
-// 3. Arahkan route '/' ke HomePage
-Route::get('/', HomePage::class);
-// ===============================================
 
 
-// Route untuk Panel Admin
-Route::get('/admin/dashboard', Dashboard::class);
-Route::get('/admin/products', ProductPage::class);
-Route::get('/admin/orders', OrderPage::class);
-Route::get('/admin/finance', FinancePage::class);
-Route::get('/admin/sliders', SliderPage::class); 
-Route::get('/katalog', CatalogPage::class);
-Route::get('/produk/{product:slug}', ProductDetailPage::class);
+// == BAGIAN 3: RUTE OTENTIKASI (LOGIN, REGISTER, DLL) ==
+// Biarkan ini di bagian paling bawah. Ini mengurus semua halaman
+// seperti /login, /register, /logout, dll.
+require __DIR__.'/auth.php';
