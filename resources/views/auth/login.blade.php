@@ -4,7 +4,7 @@
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <div class="text-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">APC Admin Login</h1>
+        <h1 class="text-2xl font-bold text-gray-800">Atribut Paskibra Cikarang</h1>
         <p class="text-gray-600">Selamat datang kembali!</p>
     </div>
 

@@ -35,3 +35,13 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 // Biarkan ini di bagian paling bawah. Ini mengurus semua halaman
 // seperti /login, /register, /logout, dll.
 require __DIR__.'/auth.php';
+
+// routes/web.php
+
+// == ROUTE DARURAT UNTUK LOGOUT ==
+Route::get('/keluar-paksa', function () {
+    auth()->logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/')->with('message', 'Anda telah berhasil logout paksa.');
+});

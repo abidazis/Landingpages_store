@@ -5,7 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Admin APC' }}</title>
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    {{-- HAPUS baris script Tailwind CDN ini, karena akan di-handle oleh @vite --}}
+    {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
+    
+    {{-- Google Fonts (bisa tetap dipertahankan) --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
+
+    {{-- TAMBAHKAN directive @vite di sini --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @livewireStyles
 </head>
@@ -62,10 +75,19 @@
         <div class="flex-1 flex flex-col">
             <header class="bg-white shadow-md p-4 flex justify-between items-center">
                 <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
+
+                {{-- Tombol Logout --}}
                 <div>
-                    {{-- Profil admin nanti --}}
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <a href="{{ route('logout') }}"
+                        onclick="event.preventDefault(); this.closest('form').submit();"
+                        class="text-gray-600 hover:text-red-500 font-semibold transition duration-300">
+                            Logout
+                        </a>
+                    </form>
                 </div>
             </header>
 
