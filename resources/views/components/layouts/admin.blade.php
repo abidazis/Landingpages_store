@@ -52,6 +52,9 @@
                     <li class="mb-2">
                         <x-layout.nav-link href="/admin/finance">Manajemen Keuangan</x-layout.nav-link>
                     </li>
+                    <li class="mb-2">
+                        <x-layout.nav-link href="/admin/sliders">Manajemen Slider</x-layout.nav-link>
+                    </li>
                 </ul>
             </nav>
         </aside>

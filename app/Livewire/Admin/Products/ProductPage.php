@@ -3,7 +3,9 @@
 namespace App\Livewire\Admin\Products;
 
 use App\Models\Product;
+use Illuminate\Support\Facades\Storage; 
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Rule;
@@ -13,6 +15,7 @@ use Illuminate\Support\Str;
 class ProductPage extends Component
 {
     use WithPagination;
+    use WithFileUploads;
 
     // Properti untuk form
     #[Rule('required|min:3')]
@@ -25,10 +28,10 @@ class ProductPage extends Component
     public $stock;
     #[Rule('required')]
     public $type = 'dijual';
+    
     public $slug;
-
-    // Properti untuk mode Edit
     public $productId;
+    public $existing_image_url;
 
     public bool $isModalOpen = false;
 
@@ -49,6 +52,7 @@ class ProductPage extends Component
         $this->price = $product->price;
         $this->stock = $product->stock;
         $this->type = $product->type;
+        $this->existing_image_url = $product->image_url;
         
         $this->openModal();
     }
@@ -67,21 +71,34 @@ class ProductPage extends Component
     // Method save yang sekarang bisa menangani 'create' dan 'update'
     public function save()
     {
-        $this->validate();
+        $rules = [
+            'name' => 'required|min:3',
+            'description' => 'required',
+            'price' => 'required|numeric',
+            'stock' => 'required|numeric',
+            'type' => 'required',
+        ];
 
-        // Buat slug baru jika nama berubah
-        $this->slug = Str::slug($this->name);
-
-        // Jika ada productId, berarti mode update. Jika tidak, mode create.
         if ($this->productId) {
-            $product = Product::findOrFail($this->productId);
-            $product->update($this->all());
-            session()->flash('message', 'Produk berhasil diperbarui.');
+            $rules['image_url'] = 'nullable|image|max:2048'; // Tidak wajib saat edit
         } else {
-            Product::create($this->all());
-            session()->flash('message', 'Produk berhasil ditambahkan.');
+            $rules['image_url'] = 'required|image|max:2048'; // Wajib saat create
+        }
+        $this->validate($rules);
+
+        $data = $this->only(['name', 'description', 'price', 'stock', 'type']);
+        $data['slug'] = Str::slug($this->name);
+
+        if ($this->image_url) {
+            if ($this->productId && $this->existing_image_url) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $this->existing_image_url));
+            }
+            $path = $this->image_url->store('products', 'public');
+            $data['image_url'] = Storage::url($path);
         }
 
+        Product::updateOrCreate(['id' => $this->productId], $data);
+        session()->flash('message', $this->productId ? 'Produk berhasil diperbarui.' : 'Produk berhasil ditambahkan.');
         $this->closeModal();
     }
 
@@ -91,5 +108,15 @@ class ProductPage extends Component
         return view('livewire.admin.products.product-page', [
             'products' => $products
         ]);
+    }
+
+    public function delete($id)
+    {
+        $product = Product::findOrFail($id);
+        if ($product->image_url) {
+            Storage::disk('public')->delete(str_replace('/storage/', '', $product->image_url));
+        }
+        $product->delete();
+        session()->flash('message', 'Produk berhasil dihapus.');
     }
 }
