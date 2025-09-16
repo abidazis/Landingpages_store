@@ -1,11 +1,11 @@
 <?php
 namespace App\Livewire\Public;
 use Livewire\Component;
-use Livewire\Attributes\Layout;
+use Livewire\Attributes\Layouts;
 use App\Models\Product;
 use App\Models\HeroSlider; 
 
-#[Layout('components.layout.app')] // <-- Menggunakan layout 'app.blade.php'
+#[Layout('components.layouts.app')] // <-- Menggunakan layout 'app.blade.php'
 class HomePage extends Component
 {
     public function render()

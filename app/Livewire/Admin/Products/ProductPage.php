@@ -28,6 +28,7 @@ class ProductPage extends Component
     public $stock;
     #[Rule('required')]
     public $type = 'dijual';
+    public $image_url;
     
     public $slug;
     public $productId;

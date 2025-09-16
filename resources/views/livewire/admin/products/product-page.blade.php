@@ -55,7 +55,6 @@
 
     {{-- Komponen Modal yang sudah benar --}}
     <x-modal :isOpen="$isModalOpen">
-        {{-- Slot untuk judul, sekarang berada DI DALAM komponen modal dan dinamis --}}
         <x-slot name="title">
             {{ $productId ? 'Edit Produk' : 'Tambah Produk Baru' }}
         </x-slot>
@@ -64,6 +63,23 @@
             <x-form.input label="Nama Produk" wireModel="name" type="text" />
             <x-form.textarea label="Deskripsi" wireModel="description" />
             
+            {{-- ========================================================== --}}
+            {{-- INI BAGIAN BARU UNTUK UPLOAD GAMBAR DENGAN PREVIEW --}}
+            <div class="mb-4">
+                <label for="image_url" class="block text-gray-700 text-sm font-bold mb-2">Upload Gambar Produk:</label>
+                @if ($image_url && method_exists($image_url, 'temporaryUrl'))
+                    <p>Preview:</p>
+                    <img src="{{ $image_url->temporaryUrl() }}" class="w-full h-40 object-cover rounded mb-2">
+                @elseif($existing_image_url)
+                    <p>Gambar Saat Ini:</p>
+                    <img src="{{ $existing_image_url }}" class="w-full h-40 object-cover rounded mb-2">
+                @endif
+                <input type="file" id="image_url" wire:model="image_url" class="w-full">
+                <div wire:loading wire:target="image_url" class="text-sm text-gray-500 mt-1">Uploading...</div>
+                @error('image_url') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            </div>
+            {{-- ========================================================== --}}
+
             <div class="grid grid-cols-2 gap-4">
                 <x-form.input label="Harga" wireModel="price" type="number" />
                 <x-form.input label="Stok" wireModel="stock" type="number" />

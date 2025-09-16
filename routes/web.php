@@ -8,6 +8,8 @@ use App\Livewire\Admin\Products\ProductPage;
 use App\Livewire\Admin\Orders\OrderPage;
 use App\Livewire\Admin\Finance\FinancePage;
 use App\Livewire\Admin\Sliders\SliderPage;
+use App\Livewire\Public\CatalogPage;
+use App\Livewire\Public\ProductDetailPage;
 
 // ===============================================
 // 1. Import komponen HomePage untuk halaman publik
@@ -34,3 +36,5 @@ Route::get('/admin/products', ProductPage::class);
 Route::get('/admin/orders', OrderPage::class);
 Route::get('/admin/finance', FinancePage::class);
 Route::get('/admin/sliders', SliderPage::class); 
+Route::get('/katalog', CatalogPage::class);
+Route::get('/produk/{product:slug}', ProductDetailPage::class);

@@ -62,10 +62,10 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 @forelse($featuredProducts as $product)
                     {{-- Kartu produk sekarang menjadi link dan punya efek bayangan yang lebih baik --}}
-                    <a href="#" class="block bg-white rounded-lg shadow-lg overflow-hidden group">
+                    <a href="/produk/{{ $product->slug }}" class="block bg-white rounded-lg shadow-lg overflow-hidden group">
                         <div class="overflow-hidden">
                             {{-- Gambar akan zoom sedikit saat di-hover --}}
-                            <img src="/public/images/layanan-penyewaan.jpg" alt="{{ $product->name }}" class="w-full h-56 object-cover transform group-hover:scale-110 transition duration-500">
+                            <img src="{{ $product->image_url ? asset($product->image_url) : 'https://via.placeholder.com/400x300' }}" alt="{{ $product->name }}" class="w-full h-56 object-cover transform group-hover:scale-110 transition duration-500">
                         </div>
                         <div class="p-6">
                             <span class="text-xs font-semibold {{ $product->type == 'dijual' ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800' }} px-3 py-1 rounded-full">
